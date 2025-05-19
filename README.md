@@ -1,18 +1,85 @@
-# ccminer for ARM (cortex-a53)
 
-Based on https://github.com/monkins1010/ccminer/tree/ARM
+# ccminer-termux
 
-Git and Build Process:
+Port and build of `ccminer` optimized for ARM devices running Termux on Android.
+
+## Features
+
+- Mining on Android via Termux
+- Supports ARM architecture (including non-AVX CPUs)
+- Built and tested in Termux (e.g. on STB devices)
+
+---
+
+## Installation Steps
+
+### 1. Install Termux
+
+Download Termux from [F-Droid](https://f-droid.org/packages/com.termux/).
+
+### 2. Install dependencies
+
+```bash
+pkg update && pkg upgrade
+pkg install git build-essential clang cmake curl openssh
 ```
-sudo apt-get update
-sudo apt-get install libcurl4-openssl-dev libssl-dev libjansson-dev automake autotools-dev build-essential -y
-sudo apt-get install -y libllvm-16-ocaml-dev libllvm16 llvm-16 llvm-16-dev llvm-16-doc llvm-16-examples llvm-16-runtime clang-16 clang-tools-16 clang-16-doc libclang-common-16-dev libclang-16-dev libclang1-16 clang-format-16 python3-clang-16 clangd-16 clang-tidy-16 libclang-rt-16-dev libpolly-16-dev libfuzzer-16-dev lldb-16 lld-16 libc++-16-dev libc++abi-16-dev libomp-16-dev libclc-16-dev libunwind-16-dev libmlir-16-dev mlir-16-tools flang-16 libclang-rt-16-dev-wasm32 libclang-rt-16-dev-wasm64 libclang-rt-16-dev-wasm32 libclang-rt-16-dev-wasm64
-git clone https://github.com/Oink70/CCminer-ARM-optimized.git
-cd CCminer-ARM-optimized
-chmod +x build.sh
-chmod +x configure.sh
-chmod +x autogen.sh
-CXX=clang++ CC=clang build.sh
+
+### 3. Clone the repository
+
+```bash
+git clone https://github.com/YOUR_USERNAME/ccminer-termux.git
+cd ccminer-termux
 ```
 
-For specific details on installing clang-16 on your current OS, check: https://apt.llvm.org/
+### 4. Compile ccminer
+
+```bash
+./autogen.sh
+./configure CXX=clang++ --with-cuda=no
+make -j$(nproc)
+```
+
+---
+
+## Common Errors & Fixes
+
+### `fatal error: 'compat/endian.h' file not found`
+
+**Fix:** Replace the include with:
+
+```cpp
+#include <endian.h>
+```
+
+or manually define:
+
+```cpp
+#ifndef htole16
+#include <stdint.h>
+#define htole16(x) (x)
+#define htole32(x) (x)
+#define htole64(x) (x)
+#define le16toh(x) (x)
+#define le32toh(x) (x)
+#define le64toh(x) (x)
+#endif
+```
+
+---
+
+### `use of undeclared identifier 'pthread_setcanceltype'`
+
+**Fix:** Wrap the code with preprocessor check:
+
+```cpp
+#ifdef __GLIBC__
+pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
+#endif
+```
+
+---
+
+
+## Credits
+
+Modified and compiled from sources originally by tpruvot and Oink70.
