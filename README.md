@@ -27,7 +27,7 @@ pkg install git build-essential clang cmake curl openssh
 ### 3. Clone the repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/ccminer-termux.git
+git clone https://github.com/moenz-id/ccminer-termux.git
 cd ccminer-termux
 ```
 
